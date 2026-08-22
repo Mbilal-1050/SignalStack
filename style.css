@@ -1,14 +1,14 @@
 /* ============================================
    SignalStack — Design tokens
-   Palette:
-     --void     #161F1B  deep charcoal-forest (base bg)
-     --surface  #1F2B24  raised panels / cards
-     --surface-2 #26332B card hover / nav
-     --paper    #F2EEE2  warm off-white (text on dark)
-     --ink      #10160F  near-black text on light chips
-     --signal   #FFB300  amber — primary accent (CTAs, links, highlights)
-     --mint     #6EE7A8  secondary accent (tags, small indicators)
-     --line     rgba(242,238,226,0.10)  hairline dividers
+   Palette (premium navy / gold editorial):
+     --void     #0F141F  deep navy-charcoal (base bg)
+     --surface  #161D2C  raised panels / cards
+     --surface-2 #1F2740 card hover / nav
+     --paper    #F2EEE4  warm ivory (text on dark)
+     --ink      #0B0E14  near-black text on light chips
+     --signal   #D6AD4E  antique gold — primary accent (CTAs, links, highlights)
+     --mint     #C98A93  rose-gold — secondary accent (tags, small indicators)
+     --line     rgba(242,238,228,0.10)  hairline dividers
    Type:
      Display: 'Fraunces'      — headlines, quirky ball-terminal serif
      Body:    'Inter'         — paragraphs, UI
@@ -18,16 +18,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
 :root {
-  --void: #161F1B;
-  --surface: #1F2B24;
-  --surface-2: #26332B;
-  --paper: #F2EEE2;
-  --paper-dim: rgba(242,238,226,0.62);
-  --ink: #10160F;
-  --signal: #FFB300;
-  --mint: #6EE7A8;
-  --line: rgba(242,238,226,0.10);
-  --line-strong: rgba(242,238,226,0.20);
+  --void: #0F141F;
+  --surface: #161D2C;
+  --surface-2: #1F2740;
+  --paper: #F2EEE4;
+  --paper-dim: rgba(242,238,228,0.62);
+  --ink: #0B0E14;
+  --signal: #D6AD4E;
+  --mint: #C98A93;
+  --line: rgba(242,238,228,0.10);
+  --line-strong: rgba(242,238,228,0.20);
 
   --font-display: 'Fraunces', serif;
   --font-body: 'Inter', sans-serif;
@@ -79,7 +79,7 @@ img { max-width: 100%; display: block; }
 }
 .trace::before,
 .trace::after { content: ""; flex: 1; height: 1px; background: repeating-linear-gradient(90deg, var(--line-strong) 0 6px, transparent 6px 12px); }
-.trace .node { width: 6px; height: 6px; border-radius: 50%; background: var(--signal); flex-shrink: 0; box-shadow: 0 0 0 4px rgba(255,179,0,0.12); }
+.trace .node { width: 6px; height: 6px; border-radius: 50%; background: var(--signal); flex-shrink: 0; box-shadow: 0 0 0 4px rgba(214,173,78,0.18); }
 
 .eyebrow {
   display: inline-flex;
@@ -95,7 +95,7 @@ img { max-width: 100%; display: block; }
   content: "";
   width: 5px; height: 5px; border-radius: 50%;
   background: var(--mint);
-  box-shadow: 0 0 0 3px rgba(110,231,168,0.15);
+  box-shadow: 0 0 0 3px rgba(201,138,147,0.18);
 }
 
 /* ---------- Header / Nav ---------- */
@@ -130,7 +130,7 @@ header.site {
   border: none; cursor: pointer;
   transition: transform .15s ease, box-shadow .15s ease;
 }
-.btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(255,179,0,0.25); }
+.btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(214,173,78,0.28); }
 .btn-ghost {
   background: transparent; color: var(--paper); border: 1px solid var(--line-strong);
 }
@@ -184,11 +184,16 @@ header.site {
 .card:hover { border-color: var(--line-strong); transform: translateY(-3px); }
 .card-thumb {
   aspect-ratio: 16/10;
-  background: linear-gradient(135deg, var(--surface-2), var(--void));
+  background:
+    radial-gradient(circle at 22% 28%, rgba(214,173,78,0.16), transparent 55%),
+    radial-gradient(circle at 82% 78%, rgba(201,138,147,0.10), transparent 50%),
+    radial-gradient(rgba(242,238,228,0.09) 1px, transparent 1.4px),
+    linear-gradient(135deg, var(--surface-2), var(--void));
+  background-size: auto, auto, 15px 15px, auto;
   position: relative;
   display: flex; align-items: center; justify-content: center;
 }
-.card-thumb .glyph { font-family: var(--font-display); font-size: 42px; color: var(--line-strong); }
+.card-thumb .glyph { font-family: var(--font-display); font-size: 42px; color: rgba(214,173,78,0.4); }
 .card-body { padding: 20px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
 .card-meta { font-family: var(--font-mono); font-size: 11.5px; color: var(--paper-dim); display: flex; gap: 10px; text-transform: uppercase; letter-spacing: 0.04em; }
 .card h3 { font-family: var(--font-display); font-size: 20px; font-weight: 600; line-height: 1.28; margin: 0; }
@@ -241,7 +246,16 @@ header.site {
 .article-head { max-width: 780px; margin: 0 auto; padding: 56px 0 24px; text-align: center; }
 .article-head h1 { font-family: var(--font-display); font-size: clamp(32px, 4.5vw, 48px); line-height: 1.12; font-weight: 600; margin: 18px 0; letter-spacing: -0.01em; }
 .article-meta { display: flex; gap: 18px; justify-content: center; font-family: var(--font-mono); font-size: 12.5px; color: var(--paper-dim); flex-wrap: wrap; }
-.article-cover { max-width: 900px; margin: 0 auto 8px; aspect-ratio: 21/9; border-radius: var(--radius); background: linear-gradient(135deg, var(--surface-2), var(--void)); border: 1px solid var(--line); }
+.article-cover {
+  max-width: 900px; margin: 0 auto 8px; aspect-ratio: 21/9; border-radius: var(--radius);
+  background:
+    radial-gradient(circle at 18% 30%, rgba(214,173,78,0.18), transparent 55%),
+    radial-gradient(circle at 85% 75%, rgba(201,138,147,0.12), transparent 50%),
+    radial-gradient(rgba(242,238,228,0.08) 1px, transparent 1.4px),
+    linear-gradient(135deg, var(--surface-2), var(--void));
+  background-size: auto, auto, 18px 18px, auto;
+  border: 1px solid var(--line);
+}
 
 .article-body { max-width: 700px; margin: 0 auto; padding: 32px 0 60px; }
 .article-body h2 { font-family: var(--font-display); font-size: 28px; font-weight: 600; margin: 44px 0 16px; letter-spacing: -0.01em; }
