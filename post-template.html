@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="pageTitle">Loading… | SignalStack</title>
+<meta id="metaDesc" name="description" content="">
+<link rel="stylesheet" href="/style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap nav">
+    <a href="/index.html" class="logo"><span class="dot"></span>SignalStack</a>
+    <nav class="nav-links">
+      <a href="/index.html">Home</a>
+      <a href="/category-ai-tools.html">AI Tools</a>
+      <a href="/category-productivity.html">Productivity</a>
+      <a href="/about.html">About</a>
+      <a href="/contact.html">Contact</a>
+    </nav>
+    <a href="/index.html#newsletter" class="btn">Subscribe</a>
+  </div>
+</header>
+
+<main>
+  <div class="wrap article-head" id="articleHead">
+    <span class="eyebrow" id="postCategory">Loading</span>
+    <h1 id="postTitle">Loading…</h1>
+    <div class="article-meta">
+      <span id="postAuthor"></span><span>·</span>
+      <span id="postDate"></span><span>·</span>
+      <span id="postReadTime"></span><span>·</span>
+      <span id="postViews">0 views</span>
+    </div>
+  </div>
+
+  <div class="wrap"><div class="article-cover" id="postCover"></div></div>
+
+  <div class="wrap ad-slot leaderboard">Ad Unit — Top of Article — Google AdSense</div>
+
+  <div class="wrap article-body">
+    <div id="postContent">
+      <p style="color:var(--paper-dim);">Loading article…</p>
+    </div>
+
+    <div style="display:flex; justify-content:center; margin:36px 0;">
+      <button id="likeBtn" class="btn btn-ghost" style="gap:10px;">
+        <span id="likeIcon">🤍</span> <span id="likeCount">0</span> Helpful
+      </button>
+    </div>
+
+    <div class="author-box">
+      <div class="author-avatar">SS</div>
+      <div>
+        <strong id="postAuthor2">SignalStack Editorial</strong>
+        <p style="margin:4px 0 0; font-size:14px; color:var(--paper-dim);">We test AI tools with real workflows, not demos, and report what actually earns a place in the stack.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="trace"><span class="node"></span></div>
+    <div class="section-head"><div><span class="eyebrow">Keep reading</span><h2>More posts</h2></div></div>
+    <div class="grid" id="relatedGrid" style="margin-bottom:60px;"></div>
+  </div>
+</main>
+
+<footer class="site">
+  <div class="wrap"><div class="footer-bottom"><span>© 2026 SignalStack. All rights reserved.</span><a href="/index.html">Back to home →</a></div></div>
+</footer>
+
+<script src="/js/supabase-config.js"></script>
+<script>
+(async function () {
+  const slug = window.location.pathname.replace(/^\/posts\//, '').replace(/\/$/, '');
+  if (!slug) { document.getElementById('postContent').innerHTML = '<p>Post not found.</p>'; return; }
+
+  const { data: post, error } = await sb.from('posts').select('*').eq('slug', slug).eq('published', true).single();
+
+  if (error || !post) {
+    document.getElementById('articleHead').innerHTML = '<h1>Post not found</h1>';
+    document.getElementById('postContent').innerHTML = '<p><a href="/index.html">← Back to home</a></p>';
+    return;
+  }
+
+  document.title = post.title + ' | SignalStack';
+  document.getElementById('metaDesc').setAttribute('content', post.excerpt || '');
+  document.getElementById('postCategory').textContent = post.category + ' · Article';
+  document.getElementById('postTitle').textContent = post.title;
+  document.getElementById('postAuthor').textContent = 'By ' + (post.author || 'SignalStack Editorial');
+  document.getElementById('postAuthor2').textContent = post.author || 'SignalStack Editorial';
+  document.getElementById('postDate').textContent = timeAgoOrDate(post.published_at);
+  document.getElementById('postReadTime').textContent = post.read_time || '5 min read';
+  document.getElementById('postViews').textContent = (post.views || 0) + ' views';
+  document.getElementById('postContent').innerHTML = post.content_html || '';
+  document.getElementById('likeCount').textContent = post.likes || 0;
+
+  // JSON-LD schema
+  const ld = document.createElement('script');
+  ld.type = 'application/ld+json';
+  ld.textContent = JSON.stringify({
+    "@context": "https://schema.org", "@type": "Article",
+    headline: post.title, description: post.excerpt,
+    author: { "@type": "Person", name: post.author || "SignalStack Editorial" },
+    datePublished: post.published_at
+  });
+  document.head.appendChild(ld);
+
+  // Track view once per browser session per post
+  const viewedKey = 'viewed:' + slug;
+  if (!sessionStorage.getItem(viewedKey)) {
+    sessionStorage.setItem(viewedKey, '1');
+    sb.rpc('increment_post_views', { p_slug: slug });
+  }
+
+  // Like button
+  const likeKey = 'liked:' + slug;
+  const likeBtn = document.getElementById('likeBtn');
+  if (localStorage.getItem(likeKey)) {
+    document.getElementById('likeIcon').textContent = '❤️';
+    likeBtn.disabled = true;
+  }
+  likeBtn.addEventListener('click', async () => {
+    if (localStorage.getItem(likeKey)) return;
+    likeBtn.disabled = true;
+    const { data: newLikes } = await sb.rpc('increment_post_likes', { p_slug: slug });
+    document.getElementById('likeCount').textContent = newLikes ?? ((post.likes || 0) + 1);
+    document.getElementById('likeIcon').textContent = '❤️';
+    localStorage.setItem(likeKey, '1');
+  });
+
+  // Related posts (same category, excluding this one)
+  const { data: related } = await sb.from('posts').select('*').eq('published', true).eq('category', post.category).neq('slug', slug).order('published_at', { ascending: false }).limit(2);
+  const grid = document.getElementById('relatedGrid');
+  if (related && related.length) {
+    grid.innerHTML = related.map(postCardHtml).join('');
+  } else {
+    grid.innerHTML = '';
+  }
+})();
+</script>
+</body>
+</html>

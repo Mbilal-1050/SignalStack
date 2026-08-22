@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin | SignalStack</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="style.css">
+<link href="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.snow.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap nav">
+    <a href="index.html" class="logo"><span class="dot"></span>SignalStack <span style="font-family:var(--font-mono); font-size:11px; color:var(--paper-dim); font-weight:400;">/admin</span></a>
+    <a href="#" id="logoutBtn" class="btn btn-ghost" style="display:none;">Log out</a>
+  </div>
+</header>
+
+<!-- LOGIN SCREEN -->
+<div class="admin-login" id="loginScreen">
+  <span class="eyebrow">Admin</span>
+  <h1 style="font-family:var(--font-display); font-size:28px; margin:14px 0 24px;">Sign in to manage posts</h1>
+  <form id="loginForm">
+    <input type="email" id="loginEmail" placeholder="Email" required autocomplete="username">
+    <input type="password" id="loginPassword" placeholder="Password" required autocomplete="current-password">
+    <button type="submit" class="btn" style="width:100%; justify-content:center;">Sign In</button>
+    <div class="admin-error" id="loginError"></div>
+  </form>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div class="admin-shell" id="dashboard" style="display:none;">
+
+  <div class="admin-header">
+    <div>
+      <span class="eyebrow">Dashboard</span>
+      <h1 style="font-family:var(--font-display); font-size:32px; margin:8px 0 0;">SignalStack Admin</h1>
+    </div>
+    <button class="btn" id="newPostBtn">+ New Post</button>
+  </div>
+
+  <div class="admin-tabs">
+    <button class="admin-tab active" data-tab="analytics">Analytics</button>
+    <button class="admin-tab" data-tab="posts">All Posts</button>
+    <button class="admin-tab" data-tab="editor" id="editorTabBtn" style="display:none;">Editor</button>
+  </div>
+
+  <!-- ANALYTICS TAB -->
+  <div id="tab-analytics">
+    <div class="stat-cards">
+      <div class="stat-card"><div class="num" id="statTotalPosts">–</div><div class="label">Total Posts</div></div>
+      <div class="stat-card"><div class="num" id="statTotalViews">–</div><div class="label">Total Views</div></div>
+      <div class="stat-card"><div class="num" id="statTotalLikes">–</div><div class="label">Total Likes</div></div>
+      <div class="stat-card"><div class="num" id="statAvgViews">–</div><div class="label">Avg Views / Post</div></div>
+    </div>
+
+    <div class="section-head"><h2 style="font-size:20px;">Top posts by views</h2></div>
+    <div id="viewsChart" style="margin-bottom:40px;"></div>
+
+    <div class="section-head"><h2 style="font-size:20px;">Top posts by likes</h2></div>
+    <div id="likesChart"></div>
+  </div>
+
+  <!-- POSTS LIST TAB -->
+  <div id="tab-posts" style="display:none;">
+    <table class="post-table">
+      <thead><tr><th>Title</th><th>Category</th><th>Views</th><th>Likes</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="postsTableBody"></tbody>
+    </table>
+  </div>
+
+  <!-- EDITOR TAB -->
+  <div id="tab-editor" style="display:none;">
+    <form class="editor-form" id="postForm">
+      <input type="hidden" id="postId">
+
+      <label>Cover Image</label>
+      <div class="dropzone" id="dropzone">
+        <img id="dropzonePreview" class="dropzone-preview" style="display:none;">
+        <p id="dropzoneText">Drag & drop an image here, or click to choose a file</p>
+        <input type="file" id="fileInput" accept="image/*" style="display:none;">
+      </div>
+
+      <div class="field-row">
+        <div>
+          <label>Title</label>
+          <input type="text" id="postTitleInput" required>
+        </div>
+        <div>
+          <label>Category</label>
+          <select id="postCategoryInput">
+            <option>AI Tools</option>
+            <option>Productivity</option>
+            <option>Guide</option>
+            <option>Comparison</option>
+          </select>
+        </div>
+      </div>
+
+      <label>Slug (URL) — auto-generated, edit if needed</label>
+      <input type="text" id="postSlugInput" required>
+
+      <label>Excerpt (shown on homepage cards)</label>
+      <textarea id="postExcerptInput" maxlength="220"></textarea>
+
+      <div class="field-row">
+        <div>
+          <label>Read Time</label>
+          <input type="text" id="postReadTimeInput" placeholder="7 min">
+        </div>
+        <div>
+          <label>Status</label>
+          <select id="postPublishedInput">
+            <option value="true">Published</option>
+            <option value="false">Draft</option>
+          </select>
+        </div>
+      </div>
+
+      <label>Content</label>
+      <div id="quillEditor"></div>
+
+      <div style="display:flex; gap:12px; margin-top:28px;">
+        <button type="submit" class="btn">Save Post</button>
+        <button type="button" class="btn btn-ghost" id="cancelEditBtn">Cancel</button>
+      </div>
+      <div class="admin-error" id="editorError"></div>
+    </form>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/quill@2.0.2/dist/quill.js"></script>
+<script src="js/supabase-config.js"></script>
+<script>
+let quill;
+let uploadedCoverUrl = null;
+let editingPostId = null;
+
+// ---------- Auth ----------
+async function checkSession() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) { showDashboard(); } else { showLogin(); }
+}
+function showLogin() {
+  document.getElementById('loginScreen').style.display = 'block';
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('logoutBtn').style.display = 'none';
+}
+function showDashboard() {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  document.getElementById('logoutBtn').style.display = 'inline-flex';
+  if (!quill) initQuill();
+  loadAnalytics();
+  loadPostsTable();
+}
+
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+  const { error } = await sb.auth.signInWithPassword({ email, password });
+  if (error) { document.getElementById('loginError').textContent = error.message; return; }
+  showDashboard();
+});
+
+document.getElementById('logoutBtn').addEventListener('click', async (e) => {
+  e.preventDefault();
+  await sb.auth.signOut();
+  showLogin();
+});
+
+// ---------- Tabs ----------
+document.querySelectorAll('.admin-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    ['analytics','posts','editor'].forEach(name => {
+      document.getElementById('tab-' + name).style.display = (name === tab.dataset.tab) ? 'block' : 'none';
+    });
+  });
+});
+
+// ---------- Quill editor ----------
+function initQuill() {
+  quill = new Quill('#quillEditor', {
+    theme: 'snow',
+    modules: { toolbar: [['bold','italic','underline'], [{header:[2,3,false]}], ['blockquote','link'], [{list:'ordered'},{list:'bullet'}], ['clean']] }
+  });
+}
+
+// ---------- New / Edit post ----------
+document.getElementById('newPostBtn').addEventListener('click', () => {
+  resetEditorForm();
+  document.getElementById('editorTabBtn').style.display = 'inline-flex';
+  document.querySelector('.admin-tab[data-tab="editor"]').click();
+});
+document.getElementById('cancelEditBtn').addEventListener('click', () => {
+  document.querySelector('.admin-tab[data-tab="posts"]').click();
+});
+
+function resetEditorForm() {
+  editingPostId = null;
+  uploadedCoverUrl = null;
+  document.getElementById('postId').value = '';
+  document.getElementById('postForm').reset();
+  document.getElementById('dropzonePreview').style.display = 'none';
+  document.getElementById('dropzoneText').textContent = 'Drag & drop an image here, or click to choose a file';
+  if (quill) quill.setContents([]);
+}
+
+document.getElementById('postTitleInput').addEventListener('input', (e) => {
+  if (editingPostId) return; // don't auto-change slug when editing existing post
+  const slug = e.target.value.toLowerCase().trim().replace(/[^a-z0-9\s-]/g,'').replace(/\s+/g,'-').replace(/-+/g,'-');
+  document.getElementById('postSlugInput').value = slug;
+});
+
+// ---------- Drag & drop image upload ----------
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+dropzone.addEventListener('click', () => fileInput.click());
+dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+dropzone.addEventListener('drop', (e) => {
+  e.preventDefault(); dropzone.classList.remove('dragover');
+  if (e.dataTransfer.files.length) handleImageFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', (e) => { if (e.target.files.length) handleImageFile(e.target.files[0]); });
+
+async function handleImageFile(file) {
+  document.getElementById('dropzoneText').textContent = 'Uploading…';
+  const ext = file.name.split('.').pop();
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;
+  const { error } = await sb.storage.from('post-images').upload(path, file);
+  if (error) { document.getElementById('dropzoneText').textContent = 'Upload failed: ' + error.message; return; }
+  const { data } = sb.storage.from('post-images').getPublicUrl(path);
+  uploadedCoverUrl = data.publicUrl;
+  const preview = document.getElementById('dropzonePreview');
+  preview.src = uploadedCoverUrl; preview.style.display = 'block';
+  document.getElementById('dropzoneText').textContent = 'Image uploaded — drop another to replace';
+}
+
+// ---------- Save post ----------
+document.getElementById('postForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const payload = {
+    title: document.getElementById('postTitleInput').value,
+    slug: document.getElementById('postSlugInput').value,
+    category: document.getElementById('postCategoryInput').value,
+    excerpt: document.getElementById('postExcerptInput').value,
+    read_time: document.getElementById('postReadTimeInput').value || '5 min',
+    published: document.getElementById('postPublishedInput').value === 'true',
+    content_html: quill.root.innerHTML,
+  };
+  if (uploadedCoverUrl) payload.cover_gradient = uploadedCoverUrl;
+
+  let result;
+  if (editingPostId) {
+    result = await sb.from('posts').update(payload).eq('id', editingPostId);
+  } else {
+    result = await sb.from('posts').insert(payload);
+  }
+  if (result.error) { document.getElementById('editorError').textContent = result.error.message; return; }
+  document.querySelector('.admin-tab[data-tab="posts"]').click();
+  loadPostsTable();
+  loadAnalytics();
+});
+
+// ---------- Load posts table ----------
+async function loadPostsTable() {
+  const { data, error } = await sb.from('posts').select('*').order('published_at', { ascending: false });
+  const tbody = document.getElementById('postsTableBody');
+  if (error || !data) { tbody.innerHTML = '<tr><td colspan="6">Could not load posts.</td></tr>'; return; }
+  tbody.innerHTML = data.map(p => `
+    <tr>
+      <td>${escapeHtml(p.title)}</td>
+      <td>${escapeHtml(p.category)}</td>
+      <td>${p.views}</td>
+      <td>${p.likes}</td>
+      <td>${p.published ? 'Published' : 'Draft'}</td>
+      <td class="row-actions">
+        <button onclick="editPost('${p.id}')">Edit</button>
+        <button class="danger" onclick="deletePost('${p.id}','${escapeHtml(p.title).replace(/'/g,"")}')">Delete</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+window.editPost = async function (id) {
+  const { data: p } = await sb.from('posts').select('*').eq('id', id).single();
+  if (!p) return;
+  editingPostId = p.id;
+  document.getElementById('postId').value = p.id;
+  document.getElementById('postTitleInput').value = p.title;
+  document.getElementById('postSlugInput').value = p.slug;
+  document.getElementById('postCategoryInput').value = p.category;
+  document.getElementById('postExcerptInput').value = p.excerpt || '';
+  document.getElementById('postReadTimeInput').value = p.read_time || '';
+  document.getElementById('postPublishedInput').value = String(p.published);
+  uploadedCoverUrl = (p.cover_gradient && p.cover_gradient.startsWith('http')) ? p.cover_gradient : null;
+  if (uploadedCoverUrl) {
+    const preview = document.getElementById('dropzonePreview');
+    preview.src = uploadedCoverUrl; preview.style.display = 'block';
+    document.getElementById('dropzoneText').textContent = 'Drop a new image to replace the cover';
+  } else {
+    document.getElementById('dropzonePreview').style.display = 'none';
+  }
+  if (!quill) initQuill();
+  quill.root.innerHTML = p.content_html || '';
+  document.getElementById('editorTabBtn').style.display = 'inline-flex';
+  document.querySelector('.admin-tab[data-tab="editor"]').click();
+};
+
+window.deletePost = async function (id, title) {
+  if (!confirm(`Delete "${title}"? This cannot be undone.`)) return;
+  await sb.from('posts').delete().eq('id', id);
+  loadPostsTable();
+  loadAnalytics();
+};
+
+// ---------- Analytics ----------
+async function loadAnalytics() {
+  const { data, error } = await sb.from('posts').select('title, views, likes');
+  if (error || !data) return;
+  const totalPosts = data.length;
+  const totalViews = data.reduce((s,p) => s + (p.views||0), 0);
+  const totalLikes = data.reduce((s,p) => s + (p.likes||0), 0);
+  document.getElementById('statTotalPosts').textContent = totalPosts;
+  document.getElementById('statTotalViews').textContent = totalViews;
+  document.getElementById('statTotalLikes').textContent = totalLikes;
+  document.getElementById('statAvgViews').textContent = totalPosts ? Math.round(totalViews/totalPosts) : 0;
+
+  const byViews = [...data].sort((a,b) => b.views - a.views).slice(0,8);
+  const maxViews = Math.max(1, ...byViews.map(p => p.views));
+  document.getElementById('viewsChart').innerHTML = byViews.map(p => `
+    <div class="analytics-row">
+      <div class="title">${escapeHtml(p.title)}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(p.views/maxViews*100).toFixed(0)}%"></div></div>
+      <div class="count">${p.views} views</div>
+    </div>`).join('') || '<p style="color:var(--paper-dim);">No data yet.</p>';
+
+  const byLikes = [...data].sort((a,b) => b.likes - a.likes).slice(0,8);
+  const maxLikes = Math.max(1, ...byLikes.map(p => p.likes));
+  document.getElementById('likesChart').innerHTML = byLikes.map(p => `
+    <div class="analytics-row">
+      <div class="title">${escapeHtml(p.title)}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(p.likes/maxLikes*100).toFixed(0)}%"></div></div>
+      <div class="count">${p.likes} likes</div>
+    </div>`).join('') || '<p style="color:var(--paper-dim);">No data yet.</p>';
+}
+
+checkSession();
+</script>
+</body>
+</html>

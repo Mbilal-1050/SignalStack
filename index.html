@@ -21,6 +21,7 @@
 <meta name="twitter:description" content="Honest, hands-on reviews of AI tools and workflows that actually save you time.">
 
 <link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script type="application/ld+json">
 {
@@ -42,7 +43,7 @@
       <a href="index.html" class="active">Home</a>
       <a href="category-ai-tools.html">AI Tools</a>
       <a href="category-productivity.html">Productivity</a>
-      <a href="posts/best-ai-tools-morning-routine.html">Reviews</a>
+      <a href="category-ai-tools.html">Reviews</a>
       <a href="about.html">About</a>
       <a href="contact.html">Contact</a>
     </nav>
@@ -59,7 +60,7 @@
       <h1>The AI tools worth your <em>time</em>, tested before you commit.</h1>
       <p class="lede">We install, break, and stress-test the AI tools everyone's talking about — then tell you plainly which ones earn a spot in your workflow and which are just noise.</p>
       <div class="hero-actions">
-        <a href="posts/best-ai-tools-morning-routine.html" class="btn">Read the latest review</a>
+        <a href="category-ai-tools.html" class="btn">Read the latest review</a>
         <a href="category-ai-tools.html" class="btn btn-ghost">Browse all tools</a>
       </div>
     </div>
@@ -76,14 +77,8 @@
   <!-- FEATURED POST -->
   <section aria-label="Featured article">
     <span class="eyebrow">Featured this week</span>
-    <div class="featured" style="margin-top:18px;">
-      <div class="card-thumb"><span class="glyph">01</span></div>
-      <div>
-        <div class="card-meta"><span>AI TOOLS</span><span>·</span><span>9 MIN READ</span></div>
-        <h3><a href="posts/best-ai-tools-morning-routine.html">10 AI Tools That Replaced My Entire Morning Routine</a></h3>
-        <p style="color:var(--paper-dim); margin:14px 0 20px;">From inbox triage to meeting prep, here's the exact stack that got my mornings back — with what each tool costs, what it doesn't do well, and what I dropped after a month.</p>
-        <a href="posts/best-ai-tools-morning-routine.html" class="btn btn-ghost">Read full review →</a>
-      </div>
+    <div class="featured" id="featuredPost" style="margin-top:18px;">
+      <p style="color:var(--paper-dim);">Loading…</p>
     </div>
   </section>
 
@@ -96,62 +91,8 @@
       </div>
       <a href="category-ai-tools.html" class="see-all">View all posts →</a>
     </div>
-    <div class="grid">
-
-      <article class="card">
-        <div class="card-thumb"><span class="glyph">02</span></div>
-        <div class="card-body">
-          <div class="card-meta"><span class="tag">Comparison</span><span>·</span><span>11 MIN</span></div>
-          <h3><a href="posts/chatgpt-vs-claude-vs-gemini.html">ChatGPT vs Claude vs Gemini: Which AI Actually Gets Work Done in 2026</a></h3>
-          <p>We ran the same 12 real work tasks through all three. The results weren't what we expected.</p>
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="card-thumb"><span class="glyph">03</span></div>
-        <div class="card-body">
-          <div class="card-meta"><span class="tag">Guide</span><span>·</span><span>8 MIN</span></div>
-          <h3><a href="posts/automate-inbox-with-ai.html">The No-Fluff Guide to Automating Your Inbox with AI</a></h3>
-          <p>A step-by-step setup that cuts email triage time by half, using tools you probably already pay for.</p>
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="card-thumb"><span class="glyph">04</span></div>
-        <div class="card-body">
-          <div class="card-meta"><span class="tag">Review</span><span>·</span><span>7 MIN</span></div>
-          <h3><a href="#">The AI Meeting Notetakers We'd Actually Pay For</a></h3>
-          <p>Five tools, one calendar, three weeks. Here's what survived the test.</p>
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="card-thumb"><span class="glyph">05</span></div>
-        <div class="card-body">
-          <div class="card-meta"><span class="tag">Productivity</span><span>·</span><span>6 MIN</span></div>
-          <h3><a href="#">Why Your AI Prompts Keep Failing (And the Fix)</a></h3>
-          <p>The three structural mistakes behind most disappointing AI outputs.</p>
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="card-thumb"><span class="glyph">06</span></div>
-        <div class="card-body">
-          <div class="card-meta"><span class="tag">AI Tools</span><span>·</span><span>5 MIN</span></div>
-          <h3><a href="#">Free vs Paid AI Writing Tools: Where the Line Actually Is</a></h3>
-          <p>Testing the exact point where a free plan stops being enough.</p>
-        </div>
-      </article>
-
-      <article class="card">
-        <div class="card-thumb"><span class="glyph">07</span></div>
-        <div class="card-body">
-          <div class="card-meta"><span class="tag">Guide</span><span>·</span><span>10 MIN</span></div>
-          <h3><a href="#">Building a One-Person AI Ops Stack From Scratch</a></h3>
-          <p>What we'd install on day one if we were starting a solo business today.</p>
-        </div>
-      </article>
-
+    <div class="grid" id="latestGrid">
+      <p style="color:var(--paper-dim);">Loading posts…</p>
     </div>
   </section>
 
@@ -213,5 +154,10 @@
   </div>
 </footer>
 
+<script src="js/supabase-config.js"></script>
+<script>
+  loadFeaturedPost('featuredPost');
+  loadLatestPosts('latestGrid', 6);
+</script>
 </body>
 </html>
