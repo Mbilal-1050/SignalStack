@@ -1,7 +1,7 @@
 // Primeloop — shared Supabase client
 // The anon key below is meant to be public (protected by Row Level Security policies).
 const SUPABASE_URL = "https://kzdcugbrgkkkqgsfkcje.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrZGN1Z2JyZ2tra3Fnc2ZrY2plIiwicmVmIjoia3pkY3VnYnJna2txZ3NmY2plIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0MDUwNTAsImV4cCI6MjEwMjk4MTA1MH0.INyFiNN7Wjl5-oQfZ8U5NAsaUR3cqpR2UWSgIQgYSkA";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6ZGN1Z2JyZ2tra3Fnc2ZrY2plIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0MDUwNTAsImV4cCI6MjEwMjk4MTA1MH0.INyFiNN7Wjl5-oQfZ8U5NAsaUR3cqpR2UWSgIQgYSkA";
 
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 function escapeHtml(str) { const div = document.createElement('div'); div.textContent = str || ''; return div.innerHTML; }
