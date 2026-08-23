@@ -74,7 +74,8 @@
 <script src="/js/supabase-config.js"></script>
 <script>
 (async function () {
-  const slug = window.location.pathname.replace(/^\/posts\//, '').replace(/\/$/, '');
+  const params = new URLSearchParams(window.location.search);
+  const slug = params.get('slug');
   if (!slug) { document.getElementById('postContent').innerHTML = '<p>Post not found.</p>'; return; }
 
   const { data: post, error } = await sb.from('posts').select('*').eq('slug', slug).eq('published', true).single();

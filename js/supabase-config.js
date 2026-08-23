@@ -20,7 +20,7 @@ function timeAgoOrDate(iso) {
 function postCardHtml(post) {
   return `
     <article class="card">
-      <a href="/posts/${post.slug}" style="display:contents;">
+      <a href="/post-template.html?slug=${post.slug}" style="display:contents;">
         <div class="card-thumb"><span class="glyph">${escapeHtml(post.category ? post.category[0] : 'S')}</span></div>
         <div class="card-body">
           <div class="card-meta"><span class="tag">${escapeHtml(post.category)}</span><span>·</span><span>${escapeHtml(post.read_time || '')}</span></div>
@@ -40,9 +40,9 @@ async function loadFeaturedPost(containerId) {
     <div class="card-thumb"><span class="glyph">${escapeHtml(data.category ? data.category[0] : 'S')}</span></div>
     <div>
       <div class="card-meta"><span>${escapeHtml((data.category||'').toUpperCase())}</span><span>·</span><span>${escapeHtml(data.read_time||'')} READ</span></div>
-      <h3><a href="/posts/${data.slug}">${escapeHtml(data.title)}</a></h3>
+      <h3><a href="/post-template.html?slug=${data.slug}">${escapeHtml(data.title)}</a></h3>
       <p style="color:var(--paper-dim); margin:14px 0 20px;">${escapeHtml(data.excerpt||'')}</p>
-      <a href="/posts/${data.slug}" class="btn btn-ghost">Read full review →</a>
+      <a href="/post-template.html?slug=${data.slug}" class="btn btn-ghost">Read full review →</a>
     </div>`;
 }
 
