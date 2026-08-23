@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title id="pageTitle">Loading… | SignalStack</title>
+<title id="pageTitle">Loading… | Primeloop</title>
 <meta id="metaDesc" name="description" content="">
 <link rel="stylesheet" href="/style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -12,7 +12,7 @@
 
 <header class="site">
   <div class="wrap nav">
-    <a href="/index.html" class="logo"><span class="dot"></span>SignalStack</a>
+    <a href="/index.html" class="logo"><span class="dot"></span>Primeloop</a>
     <nav class="nav-links">
       <a href="/index.html">Home</a>
       <a href="/category-ai-tools.html">AI Tools</a>
@@ -54,7 +54,7 @@
     <div class="author-box">
       <div class="author-avatar">SS</div>
       <div>
-        <strong id="postAuthor2">SignalStack Editorial</strong>
+        <strong id="postAuthor2">Primeloop Editorial</strong>
         <p style="margin:4px 0 0; font-size:14px; color:var(--paper-dim);">We test AI tools with real workflows, not demos, and report what actually earns a place in the stack.</p>
       </div>
     </div>
@@ -68,7 +68,7 @@
 </main>
 
 <footer class="site">
-  <div class="wrap"><div class="footer-bottom"><span>© 2026 SignalStack. All rights reserved.</span><a href="/index.html">Back to home →</a></div></div>
+  <div class="wrap"><div class="footer-bottom"><span>© 2026 Primeloop. All rights reserved.</span><a href="/index.html">Back to home →</a></div></div>
 </footer>
 
 <script src="/js/supabase-config.js"></script>
@@ -86,12 +86,12 @@
     return;
   }
 
-  document.title = post.title + ' | SignalStack';
+  document.title = post.title + ' | Primeloop';
   document.getElementById('metaDesc').setAttribute('content', post.excerpt || '');
   document.getElementById('postCategory').textContent = post.category + ' · Article';
   document.getElementById('postTitle').textContent = post.title;
-  document.getElementById('postAuthor').textContent = 'By ' + (post.author || 'SignalStack Editorial');
-  document.getElementById('postAuthor2').textContent = post.author || 'SignalStack Editorial';
+  document.getElementById('postAuthor').textContent = 'By ' + (post.author || 'Primeloop Editorial');
+  document.getElementById('postAuthor2').textContent = post.author || 'Primeloop Editorial';
   document.getElementById('postDate').textContent = timeAgoOrDate(post.published_at);
   document.getElementById('postReadTime').textContent = post.read_time || '5 min read';
   document.getElementById('postViews').textContent = (post.views || 0) + ' views';
@@ -104,7 +104,7 @@
   ld.textContent = JSON.stringify({
     "@context": "https://schema.org", "@type": "Article",
     headline: post.title, description: post.excerpt,
-    author: { "@type": "Person", name: post.author || "SignalStack Editorial" },
+    author: { "@type": "Person", name: post.author || "Primeloop Editorial" },
     datePublished: post.published_at
   });
   document.head.appendChild(ld);

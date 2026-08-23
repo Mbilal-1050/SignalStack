@@ -1,4 +1,4 @@
-# SignalStack — Aapki Blog Website Ka Complete Guide
+# Primeloop — Aapki Blog Website Ka Complete Guide
 
 ## 1. Niche Kyun Choose Kiya
 **AI Tools & Productivity** niche choose kiya gaya hai kyunke:
@@ -22,30 +22,30 @@ Content **English** mein rakha gaya hai kyunke AdSense ki earning English/global
 Website static HTML hai, isliye ye options fast aur bilkul FREE hain. Main aapke Vercel account mein direct login nahi kar sakta (mera access sirf is chat tak hai), lekin `vercel.json` already ready hai — bas neeche wala tareeqa follow karein:
 
 ### Option A — Vercel Dashboard (bina coding, sabse aasan)
-1. `signalstack.zip` download karein aur apne computer per unzip kar lein
+1. `primeloop.zip` download karein aur apne computer per unzip kar lein
 2. [vercel.com](https://vercel.com) per free account banayein (GitHub/Google se sign up ho jata hai)
-3. Sabse pehle apna unzip kiya hua `signalstack` folder GitHub per upload karein (GitHub.com → New Repository → "uploading an existing file" wala link use karein, drag-drop se sab files daal dein)
+3. Sabse pehle apna unzip kiya hua `primeloop` folder GitHub per upload karein (GitHub.com → New Repository → "uploading an existing file" wala link use karein, drag-drop se sab files daal dein)
 4. Vercel dashboard mein **"Add New" → "Project"** → us GitHub repo ko **Import** karein → "Deploy" per click karein
-5. 30-60 second mein live link mil jayega (e.g. `signalstack.vercel.app`)
+5. 30-60 second mein live link mil jayega (e.g. `primeloop.vercel.app`)
 
 ### Option B — Vercel CLI (agar computer per Node.js installed hai)
 Terminal/CMD kholein aur ye commands chalayein:
 ```
 npm i -g vercel
-cd signalstack
+cd primeloop
 vercel login
 vercel --prod
 ```
 Ye seedha aapke Vercel account se login karke deploy kar dega — GitHub ki zaroorat nahi.
 
 ### Option C — Netlify / Cloudflare Pages (zero setup)
-1. **Netlify**: netlify.com → "Deploy manually" → poora `signalstack` folder seedha drag-drop karein → live ho jayega
+1. **Netlify**: netlify.com → "Deploy manually" → poora `primeloop` folder seedha drag-drop karein → live ho jayega
 2. **Cloudflare Pages**: cloudflare.com/pages — same drag-drop process, aur bhi fast loading
 
-Apna domain (e.g. signalstack.com) GoDaddy/Namecheap se kharidein (~$10/year) aur Netlify/Cloudflare mein connect kar dein — professional look ke liye domain zaroori hai.
+Apna domain (e.g. primeloop.com) GoDaddy/Namecheap se kharidein (~$10/year) aur Netlify/Cloudflare mein connect kar dein — professional look ke liye domain zaroori hai.
 
 ## 4. Zaroori Changes Deploy Karne Se Pehle
-- Har file mein `signalstack.example` ko apne asal domain se replace karein
+- Har file mein `primeloop.example` ko apne asal domain se replace karein
 - `privacy.html` mein apna real business name/country dalein
 - `contact.html` mein real email address dalein
 - Google Analytics add karein (free, traffic track karne ke liye)

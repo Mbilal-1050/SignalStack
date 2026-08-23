@@ -1,4 +1,4 @@
-// SignalStack — shared Supabase client
+// Primeloop — shared Supabase client
 // The anon key below is meant to be public (protected by Row Level Security policies).
 const SUPABASE_URL = "https://kzdcugbrgkkkqgsfkcje.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imt6ZGN1Z2JyZ2tra3Fnc2ZrY2plIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0MDUwNTAsImV4cCI6MjEwMjk4MTA1MH0.INyFiNNW7jl5-oQfZ8U5NAsaUR3cqpR2UWSgIQgYSkA";
