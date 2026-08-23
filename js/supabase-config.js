@@ -1,22 +1,19 @@
 // Primeloop — shared Supabase client
 // The anon key below is meant to be public (protected by Row Level Security policies).
 const SUPABASE_URL = "https://kzdcugbrgkkkqgsfkcje.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrZGN1Z2JyZ2tra3Fnc2ZrY2plIiwicmVmIjoia3pkY3VnYnJna2txZ3NmY2plIiwicm9sIjoiYW5vbiIsImlhdCI6MTc4NzQwNTA1MCwiZXhwIjoyMTAyOTgxMDUwfQ.INyFiNNW7jl5-oQfZ8U5NAsaUR3cqpR2UWSgIQgYSkA";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJrZGN1Z2JyZ2tra3Fnc2ZrY2plIiwicmVmIjoiemtjZG9nYnJnemt4Z3NmY2plIiwicm9sIjoiYW5vbiIsImlhdCI6MTc4NzQwNTA1MCwiZXhwIjoyMTAyOTgxMDUwfQ.INyFiNNW7jl5-oQfZ8U5NAsaUR3cqpR2UWSgIQgYSkA";
 
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ---------- Shared render helpers ----------
 function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str || '';
   return div.innerHTML;
 }
-
 function timeAgoOrDate(iso) {
   const d = new Date(iso);
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
-
 function coverHtml(post, className = 'card-thumb') {
   const url = post && post.cover_gradient;
   if (url && /^https?:\/\//i.test(url)) {
@@ -24,7 +21,6 @@ function coverHtml(post, className = 'card-thumb') {
   }
   return `<div class="${className}"><span class="glyph">${escapeHtml(post && post.category ? post.category[0] : 'S')}</span></div>`;
 }
-
 function postCardHtml(post) {
   return `
     <article class="card">
@@ -38,22 +34,17 @@ function postCardHtml(post) {
       </a>
     </article>`;
 }
-
 async function loadFeaturedPost(containerId) {
   const el = document.getElementById(containerId);
   if (!el) return;
   const { data, error } = await sb.from('posts').select('*').eq('published', true).order('published_at', { ascending: false }).limit(1).single();
   if (error || !data) { el.style.display = 'none'; return; }
-  el.innerHTML = `
-    ${coverHtml(data)}
-    <div>
-      <div class="card-meta"><span>${escapeHtml((data.category||'').toUpperCase())}</span><span>·</span><span>${escapeHtml(data.read_time||'')} READ</span></div>
-      <h3><a href="/post-template.html?slug=${encodeURIComponent(data.slug)}">${escapeHtml(data.title)}</a></h3>
-      <p style="color:var(--paper-dim); margin:14px 0 20px;">${escapeHtml(data.excerpt||'')}</p>
-      <a href="/post-template.html?slug=${encodeURIComponent(data.slug)}" class="btn btn-ghost">Read full review →</a>
-    </div>`;
+  el.innerHTML = `${coverHtml(data)}
+    <div><div class="card-meta"><span>${escapeHtml((data.category||'').toUpperCase())}</span><span>·</span><span>${escapeHtml(data.read_time||'')} READ</span></div>
+    <h3><a href="/post-template.html?slug=${encodeURIComponent(data.slug)}">${escapeHtml(data.title)}</a></h3>
+    <p style="color:var(--paper-dim); margin:14px 0 20px;">${escapeHtml(data.excerpt||'')}</p>
+    <a href="/post-template.html?slug=${encodeURIComponent(data.slug)}" class="btn btn-ghost">Read full review →</a></div>`;
 }
-
 async function loadLatestPosts(containerId, limit = 6, category = null) {
   const el = document.getElementById(containerId);
   if (!el) return;
