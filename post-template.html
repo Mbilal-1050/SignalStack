@@ -16,7 +16,18 @@
 <div class="wrap article-head" id="articleHead"><span class="eyebrow" id="postCategory">Loading</span><h1 id="postTitle">Loading…</h1><div class="article-meta"><span id="postAuthor"></span><span>·</span><span id="postDate"></span><span>·</span><span id="postReadTime"></span><span>·</span><span id="postViews">0 views</span></div></div>
 <div class="wrap"><div class="article-cover" id="postCover"></div></div>
 <div class="wrap ad-slot leaderboard">Ad Unit — Top of Article — Google AdSense</div>
-<div class="wrap article-body"><div id="postContent"><p style="color:var(--paper-dim);">Loading article…</p></div><div style="display:flex;justify-content:center;margin:36px 0;"><button id="likeBtn" class="btn btn-ghost" style="gap:10px;"><span id="likeIcon">🤍</span> <span id="likeCount">0</span> Helpful</button></div><div class="author-box"><div class="author-avatar">SS</div><div><strong id="postAuthor2">Primeloop Editorial</strong><p style="margin:4px 0 0;font-size:14px;color:var(--paper-dim);">We test AI tools with real workflows, not demos, and report what actually earns a place in the stack.</p></div></div></div>
+<div class="wrap article-body"><div id="postContent"><p style="color:var(--paper-dim);">Loading article…</p></div><div style="display:flex;justify-content:center;gap:12px;margin:36px 0;flex-wrap:wrap;"><button id="likeBtn" class="btn btn-ghost" style="gap:10px;"><span id="likeIcon">🤍</span> <span id="likeCount">0</span> Helpful</button><button id="shareBtn" class="btn btn-ghost" style="gap:10px;">🔗 Share</button></div><div class="author-box"><div class="author-avatar">SS</div><div><strong id="postAuthor2">Primeloop Editorial</strong><p style="margin:4px 0 0;font-size:14px;color:var(--paper-dim);">We test AI tools with real workflows, not demos, and report what actually earns a place in the stack.</p></div></div>
+
+<div class="trace"><span class="node"></span></div>
+<div class="section-head"><h2 style="font-size:22px;">Comments (<span id="commentCount">0</span>)</h2></div>
+<form id="commentForm" style="margin-bottom:32px;">
+  <input type="text" id="commentName" placeholder="Your name" required maxlength="60" style="width:100%;background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;padding:11px 14px;font-family:var(--font-body);font-size:14px;color:var(--paper);margin-bottom:10px;">
+  <textarea id="commentText" placeholder="Share your thoughts…" required maxlength="1000" style="width:100%;min-height:80px;background:var(--surface);border:1px solid var(--line-strong);border-radius:8px;padding:11px 14px;font-family:var(--font-body);font-size:14px;color:var(--paper);resize:vertical;margin-bottom:10px;"></textarea>
+  <button type="submit" class="btn">Post Comment</button>
+  <span id="commentError" style="color:#C0392B;font-size:13px;margin-left:10px;"></span>
+</form>
+<div id="commentsList"></div>
+</div>
 <div class="wrap"><div class="trace"><span class="node"></span></div><div class="section-head"><div><span class="eyebrow">Keep reading</span><h2>More posts</h2></div></div><div class="grid" id="relatedGrid" style="margin-bottom:60px;"></div></div>
 </main><footer class="site"><div class="wrap"><div class="footer-bottom"><span>© 2026 Primeloop. All rights reserved.</span><a href="/index.html">Back to home →</a></div></div></footer>
 <script src="/js/supabase-config.js"></script>
@@ -29,8 +40,58 @@
  document.title=post.title+' | Primeloop';document.getElementById('metaDesc').setAttribute('content',post.excerpt||'');document.getElementById('postCategory').textContent=post.category+' · Article';document.getElementById('postTitle').textContent=post.title;document.getElementById('postAuthor').textContent='By '+(post.author||'Primeloop Editorial');document.getElementById('postAuthor2').textContent=post.author||'Primeloop Editorial';document.getElementById('postDate').textContent=timeAgoOrDate(post.published_at);document.getElementById('postReadTime').textContent=post.read_time||'5 min read';document.getElementById('postViews').textContent=(post.views||0)+' views';document.getElementById('postContent').innerHTML=post.content_html||'';document.getElementById('likeCount').textContent=post.likes||0;
  const cover=document.getElementById('postCover'); if(post.cover_gradient&&/^https?:\/\//i.test(post.cover_gradient)){cover.style.backgroundImage=`url('${post.cover_gradient.replace(/'/g,"%27")}')`;cover.style.backgroundSize='cover';cover.style.backgroundPosition='center';cover.style.minHeight='420px';} else {cover.innerHTML='<span class="glyph">'+escapeHtml(post.category?post.category[0]:'S')+'</span>';}
  const ld=document.createElement('script');ld.type='application/ld+json';ld.textContent=JSON.stringify({'@context':'https://schema.org','@type':'Article',headline:post.title,description:post.excerpt,author:{'@type':'Person',name:post.author||'Primeloop Editorial'},datePublished:post.published_at});document.head.appendChild(ld);
- const viewedKey='viewed:'+slug;if(!sessionStorage.getItem(viewedKey)){sessionStorage.setItem(viewedKey,'1');sb.rpc('increment_post_views',{p_slug:slug});}
+ sb.rpc('increment_post_views',{p_slug:slug});
  const likeKey='liked:'+slug,likeBtn=document.getElementById('likeBtn');if(localStorage.getItem(likeKey)){document.getElementById('likeIcon').textContent='❤️';likeBtn.disabled=true;}likeBtn.addEventListener('click',async()=>{if(localStorage.getItem(likeKey))return;likeBtn.disabled=true;const {data:newLikes}=await sb.rpc('increment_post_likes',{p_slug:slug});document.getElementById('likeCount').textContent=newLikes??((post.likes||0)+1);document.getElementById('likeIcon').textContent='❤️';localStorage.setItem(likeKey,'1');});
+
+ const shareBtn=document.getElementById('shareBtn');
+ shareBtn.addEventListener('click', async () => {
+   const shareData = { title: post.title, text: post.excerpt || post.title, url: window.location.href };
+   if (navigator.share) {
+     try { await navigator.share(shareData); } catch (e) {}
+   } else {
+     try {
+       await navigator.clipboard.writeText(window.location.href);
+       const original = shareBtn.innerHTML;
+       shareBtn.innerHTML = '✅ Link copied';
+       setTimeout(() => { shareBtn.innerHTML = original; }, 2000);
+     } catch (e) {
+       prompt('Copy this link:', window.location.href);
+     }
+   }
+ });
+
+ async function loadComments() {
+   const { data: comments } = await sb.from('comments').select('*').eq('post_id', post.id).eq('approved', true).order('created_at', { ascending: false });
+   const list = document.getElementById('commentsList');
+   document.getElementById('commentCount').textContent = comments ? comments.length : 0;
+   if (!comments || comments.length === 0) {
+     list.innerHTML = '<p style="color:var(--paper-dim);font-size:14px;">No comments yet — be the first to share your thoughts.</p>';
+     return;
+   }
+   list.innerHTML = comments.map(c => `
+     <div style="border-bottom:1px solid var(--line);padding:16px 0;">
+       <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+         <strong style="font-size:14px;">${escapeHtml(c.author_name)}</strong>
+         <span style="font-family:var(--font-mono);font-size:11px;color:var(--paper-dim);">${timeAgoOrDate(c.created_at)}</span>
+       </div>
+       <p style="margin:0;font-size:14px;color:var(--paper-dim);">${escapeHtml(c.comment_text)}</p>
+     </div>`).join('');
+ }
+ loadComments();
+
+ document.getElementById('commentForm').addEventListener('submit', async (e) => {
+   e.preventDefault();
+   const name = document.getElementById('commentName').value.trim();
+   const text = document.getElementById('commentText').value.trim();
+   const errEl = document.getElementById('commentError');
+   errEl.textContent = '';
+   if (!name || !text) return;
+   const { error: cErr } = await sb.from('comments').insert({ post_id: post.id, author_name: name, comment_text: text });
+   if (cErr) { errEl.textContent = 'Could not post comment. Try again.'; return; }
+   document.getElementById('commentForm').reset();
+   loadComments();
+ });
+
  const {data:related}=await sb.from('posts').select('*').eq('published',true).neq('slug',slug).order('published_at',{ascending:false}).limit(3);const grid=document.getElementById('relatedGrid');grid.innerHTML=related&&related.length?related.map(postCardHtml).join(''):'<p style="color:var(--paper-dim);">More posts coming soon.</p>';
 })();
 </script></body></html>
