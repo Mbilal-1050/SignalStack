@@ -45,6 +45,8 @@ async function loadFeaturedPost(containerId) {
       <a href="/posts/${data.slug}" class="btn btn-ghost">Read full review →</a>
     </div>`;
 }
+
+async function loadLatestPosts(containerId, limit = 6, category = null) {
   const el = document.getElementById(containerId);
   if (!el) return;
   let query = sb.from('posts').select('*').eq('published', true).order('published_at', { ascending: false }).limit(limit);
