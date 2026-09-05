@@ -16,9 +16,28 @@ function timeAgoOrDate(iso) {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
+// Local fallback artwork for posts that do not yet have a cover_gradient in Supabase.
+// These files live in the repository so the site does not depend on a database write.
+const LOCAL_COVER_IMAGES = {
+  'open-source-vs-proprietary-ai-small-business': '/assets/blog-images/open-source-vs-proprietary-ai-small-business.svg',
+  'ai-search-vs-google': '/assets/blog-images/ai-search-vs-google.svg',
+  'ai-note-taking-apps-compared': '/assets/blog-images/ai-note-taking-apps-compared.svg',
+  'best-ai-coding-assistants-compared': '/assets/blog-images/best-ai-coding-assistants-compared.svg',
+  'ai-agents-explained-2026': '/assets/blog-images/ai-agents-explained-2026.svg',
+  'ai-image-generators-compared': '/assets/blog-images/ai-image-generators-compared.svg',
+  'when-ai-tools-make-you-slower': '/assets/blog-images/when-ai-tools-make-you-slower.svg',
+  'one-person-ai-ops-stack': '/assets/blog-images/one-person-ai-ops-stack.svg'
+};
+
+function getCoverUrl(post) {
+  const dbUrl = post && post.cover_gradient;
+  if (dbUrl && /^https?:\/\//i.test(dbUrl)) return dbUrl;
+  return post && post.slug ? (LOCAL_COVER_IMAGES[post.slug] || '') : '';
+}
+
 function coverHtml(post, className = 'card-thumb') {
-  const url = post && post.cover_gradient;
-  if (url && /^https?:\/\//i.test(url)) {
+  const url = getCoverUrl(post);
+  if (url) {
     return `<div class="${className}" style="background-image:url('${escapeHtml(url)}');background-size:cover;background-position:center;"></div>`;
   }
   return `<div class="${className}"><span class="glyph">${escapeHtml(post && post.category ? post.category[0] : 'S')}</span></div>`;
