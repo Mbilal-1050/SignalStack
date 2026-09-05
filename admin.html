@@ -202,8 +202,35 @@ document.querySelectorAll('.admin-tab').forEach(tab => {
 function initQuill() {
   quill = new Quill('#quillEditor', {
     theme: 'snow',
-    modules: { toolbar: [['bold','italic','underline'], [{header:[2,3,false]}], ['blockquote','link'], [{list:'ordered'},{list:'bullet'}], ['clean']] }
+    modules: { toolbar: {
+      container: [['bold','italic','underline'], [{header:[2,3,false]}], ['blockquote','link','image'], [{list:'ordered'},{list:'bullet'}], ['clean']],
+      handlers: { image: quillImageHandler }
+    } }
   });
+}
+
+function quillImageHandler() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = async () => {
+    const file = input.files[0];
+    if (!file) return;
+    const range = quill.getSelection(true);
+    quill.insertText(range.index, 'Uploading image…', { italic: true });
+    const ext = file.name.split('.').pop();
+    const path = `content-${Date.now()}-${Math.random().toString(36).slice(2,8)}.${ext}`;
+    const { error } = await sb.storage.from('post-images').upload(path, file);
+    quill.deleteText(range.index, 'Uploading image…'.length);
+    if (error) {
+      document.getElementById('editorError').textContent = 'Image upload failed: ' + error.message;
+      return;
+    }
+    const { data } = sb.storage.from('post-images').getPublicUrl(path);
+    quill.insertEmbed(range.index, 'image', data.publicUrl);
+    quill.setSelection(range.index + 1);
+  };
+  input.click();
 }
 
 // ---------- New / Edit post ----------

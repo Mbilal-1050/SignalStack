@@ -272,6 +272,7 @@ header.site {
   font-family: var(--font-display); font-style: italic; font-size: 20px; color: var(--paper);
 }
 .article-body a { color: var(--signal); text-decoration: underline; text-underline-offset: 3px; }
+.article-body img { width: 100%; height: auto; border-radius: 10px; margin: 28px 0; display: block; }
 .article-body strong { color: var(--paper); }
 .toc { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px 26px; margin: 32px 0; }
 .toc p.label { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--mint); margin: 0 0 12px; }
